@@ -1,6 +1,6 @@
 <div align="center">
 
-# DeepAudit
+<img width="87" height="20" alt="image" src="https://github.com/user-attachments/assets/ffce4812-f6d5-4468-8758-4e034fa33158" />
 
 **The security auditor that ships only what it can prove.**
 
