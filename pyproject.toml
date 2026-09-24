@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deepaudit"
+version = "0.1.0"
+description = "Prove-It-Or-Don't-Ship Security Auditor"
+readme = "deepaudit/README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "DeepAudit Authors"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "cryptography",
+]
+
+[project.optional-dependencies]
+# jinja2: the template_injection test fixture imports it, so the exploit
+# harness can only prove that finding when jinja2 is installed.
+dev = ["pytest", "jinja2"]
+
+[project.scripts]
+deepaudit = "deepaudit.cli.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["deepaudit"]
