@@ -20,6 +20,8 @@ Most scanners hand you a wall of "possible" vulnerabilities. DeepAudit reports o
 
 ---
 
+**The specification:** [`docs/specification/`](docs/specification/) holds the specification Sneferu built this from, copied word for word from its run record.
+
 ## Proof, not suspicion
 
 Every shipped finding carries an **exploit/control differential**. A fresh random sentinel appears in the exploit run and is absent from the matched control run. If DeepAudit can't reproduce that difference, the candidate is labeled `UNVERIFIED` and kept out of the signed findings bundle.
@@ -138,7 +140,7 @@ deepaudit verify <bundle> [--re-run <repo>]
 
 `scan` exits `0` when it writes a bundle, including a bundle with zero proven findings, and `3` for invalid input or missing authorization. `verify` exits `0` for a valid bundle and `1` for an invalid or tampered one.
 
-More detail: [`deepaudit/README.md`](deepaudit/README.md), the template catalog in [`deepaudit/docs/TEMPLATES.md`](deepaudit/docs/TEMPLATES.md), and the build record (specification, implementation notes, finalizer notes) in [`docs/build-record/`](docs/build-record/).
+More detail: [`deepaudit/README.md`](deepaudit/README.md), the template catalog in [`deepaudit/docs/TEMPLATES.md`](deepaudit/docs/TEMPLATES.md), the specification in [`docs/specification/`](docs/specification/), and the build record (implementation notes, finalizer notes) in [`docs/build-record/`](docs/build-record/).
 
 ## Status, honestly
 

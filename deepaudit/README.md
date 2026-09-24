@@ -132,7 +132,7 @@ Repo Map     → Convergence    → Proof Exec     → Bundle + Sign
 
 Static findings (secrets in code) bypass Stages 2 and 3. There is no separate adversarial-attack stage in v1 — the Sneferu `POST /sdk/judge` call (`claudopus.Client.judge`, unanimous agreement across distinct trainer lineages) **is** the cross-lineage adversarial convergence gate.
 
-The build record (specification, implementation notes, finalizer notes) is in [`../docs/build-record/`](../docs/build-record/).
+The specification is in [`../docs/specification/`](../docs/specification/). The build record (implementation notes, finalizer notes) is in [`../docs/build-record/`](../docs/build-record/).
 
 See [`docs/TEMPLATES.md`](docs/TEMPLATES.md) for the PoC template catalog and adapter design.
 
