@@ -4,7 +4,7 @@
 
 **The security auditor that ships only what it can prove.**
 
-Most scanners hand you a wall of "possible" vulnerabilities. DeepAudit reports one only after exploiting it next to a matched control run, and it signs the result.
+Most scanners hand you a wall of "possible" vulnerabilities. DeepAudit reports one only after exploiting it next to a matched control run, and it signs the result. This app still needs some work. 
 
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-39%20passed-2ea44f)
@@ -62,30 +62,7 @@ Hardcoded secrets are found directly during mapping and skip the proof pipeline.
 
 ## Built on the Sneferu SDK
 
-DeepAudit doesn't reimplement multi-model convergence. It calls Sneferu for it, through Sneferu's public Python SDK (the `claudopus` package):
-
-```python
-from claudopus import Client
-jr = Client(base_url).judge({
-    "claim": "The following is a GENUINELY EXPLOITABLE sql_injection vulnerability (cross-file): ...",
-    "context": "SOURCE ... SINK ... Taint path ... Sanitizers seen on path: NONE",
-    "question": "Is this a genuinely exploitable vulnerability ...?",
-    "require_agreement": "unanimous",
-    "claim_id": candidate_id,
-})
-# jr.agreed is true only when distinct trainer lineages affirmed the claim
-```
-
-| Piece | What it is |
-|---|---|
-| Call | `claudopus.Client.judge(JudgeRequest)` → `POST /sdk/judge` on a running Sneferu engine |
-| Where | `CLAUDOPUS_BASE_URL`, default `http://127.0.0.1:7420` |
-| Install | the SDK ships inside Sneferu, not on PyPI: `pip install -e <sneferu>/sdk/python` |
-| Availability | one fast `GET /cast-presets` probe per scan; no SDK or no engine means the built-in mock is used, and the bundle says so |
-| Failure | a judge error is a non-agreement, never a silent yes |
-| Record | the bundle's `sdk` block: `convergence_client`, `convergence_is_mock`, `engine_reported_mock`, `engine_reported_degraded` |
-
-**Checked against a real Sneferu engine (2026-09-23).** Both runs used a Sneferu server built from its own source (checkout `07174496`) and DeepAudit's own CLI:
+DeepAudit doesn't reimplement multi-model convergence. It calls Sneferu for it, through Sneferu's public Python SDK:
 
 - **Engine in mock mode:** the scan reached `/sdk/judge`, and two mock lineages agreed. The finding was proven, and the bundle recorded `convergence_is_mock: true` and `engine_reported_mock: true`.
 - **Engine live, with no model keys on that machine:** the engine answered degraded, so nothing converged and nothing was proven. The bundle recorded `engine_reported_degraded: true`.
@@ -149,19 +126,10 @@ More detail: [`deepaudit/README.md`](deepaudit/README.md), the template catalog 
 - **Live-model convergence is unexercised**, as described above.
 - **No pricing, accounts or telemetry:** this is the working engine.
 
-### Fixed while preparing this repository
-
-- **This repository first held the wrong copy.** It was a snapshot from before Sneferu wired DeepAudit to the SDK, and it called `claudopus.convergence.judge`, which never existed. The code here is now the finalized, SDK-wired build from the run's own worktree.
-- **The bundle can no longer claim real convergence when the engine answered with mock judges.** DeepAudit only looked at which client class ran. Now it also records what the engine said (`is_mock`, `degraded`), and a scan against a mock-mode Sneferu is marked `convergence_is_mock: true`.
-- **The CLI warning says what actually ran.** It used to print "uses the built-in MOCK judge" on every run, even when Sneferu judged the candidates.
-- **`jinja2` added to the dev extras.** Without it, the template-injection fixture couldn't be proven and one test failed on a clean install.
-- **Docs corrected.** The bundled README said proofs ran in an isolated Docker container by default and documented an exit code the CLI never returns. A stale architecture doc that described the nonexistent SDK call was removed.
 
 ## How it was made
 
-DeepAudit was specified as *a sellable developer security tool built on the Sneferu SDK*. Sneferu code run `2026-06-25T13-12-07Z-code-07c0ebd5` built this v1 engine from a revision-5 root specification, in cooperative rounds between independent coder and reviewer models. A frontier finalizer pass then made the bundle honest about its sandbox and scrubbed the harness environment.
-
-That build exposed a gap in Sneferu itself. The public SDK could start runs but couldn't answer a single yes-or-no question across model lineages, so DeepAudit had fallen back to a mock. The same day, Sneferu gained `POST /sdk/judge` and `Client.judge` (*sdk-judge-v1*) and wired DeepAudit to them. Products now declare the SDK symbols they use in a `claudopus_sdk_usage:` spec block, and the build seeds the SDK automatically. DeepAudit was the SDK's first customer.
+DeepAudit was specified as *a sellable developer security tool built on the Sneferu SDK*. Sneferu code run `2026-06-25T13-12-07Z-code-07c0ebd5` built this v1 engine from a revision-5 root specification, in cooperative rounds between independent coder and reviewer models. 
 
 <div align="center">
 
